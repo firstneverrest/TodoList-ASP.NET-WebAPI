@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 #nullable disable
 
-namespace todolist.Models
+namespace TodoApi.Models
 {
     public partial class AMCDbContext : DbContext
     {
