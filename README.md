@@ -5,13 +5,13 @@
 Select MariaDB as a SQL database server. MariaDB is an open-source relational database management system(RDBMS) like MySQL.
 
 1. Install [MariaDB](https://downloads.mariadb.org/)
-2. Install Xampp to run database server on localhost for Web API development
+2. Install [Xampp](https://www.apachefriends.org/download.html) to run database server on localhost for Web API development
 3. Open Xampp, run Apache and mySQL. If the port error is occurred, you can change the port in Config section.
 4. Create database (todolist) and two tables: user and activity
 
 ## Set up ASP.NET Web API
 
-1. Install [.NET 5.0 SDK in official website](https://dotnet.microsoft.com/download).
+1. Install [.NET 5.0 SDK from official website](https://dotnet.microsoft.com/download).
 2. run `dotnet --version` to check whether dotnet is already installed or not.
 3. run these command to create web api project
 
