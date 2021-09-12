@@ -35,8 +35,6 @@ namespace TodoApi.Models
 
             modelBuilder.Entity<Activity>(entity =>
             {
-                entity.HasNoKey();
-
                 entity.ToTable("activity");
 
                 entity.Property(e => e.Id).HasColumnType("int(10) unsigned");
