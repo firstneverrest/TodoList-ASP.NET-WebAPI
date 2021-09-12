@@ -171,7 +171,7 @@ namespace TodoApi.Controllers
         public IActionResult SignUp([FromBody] Account account)
         {
             string[] hashedAndSalt = HashFunction.CreateHashAndSalt(account.password);
-            string salt = hashedAndSalt[0].ToString();
+            string salt = hashedAndSalt[0];
             string hash = hashedAndSalt[1]; 
 
             try {
