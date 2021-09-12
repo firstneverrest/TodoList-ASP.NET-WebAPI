@@ -37,7 +37,7 @@ namespace TodoApi.Models
             {
                 entity.ToTable("activity");
 
-                entity.Property(e => e.Id).HasColumnType("int(10) unsigned");
+                entity.Property(e => e.Id).HasColumnType("int(10) unsigned").ValueGeneratedOnAdd();
 
                 entity.Property(e => e.Name)
                     .IsRequired()
