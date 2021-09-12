@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using TodoApi.Models;
 
 namespace TodoApi.Controllers
 {
@@ -18,5 +19,24 @@ namespace TodoApi.Controllers
             _logger = logger;
         }
 
+        [HttpGet]
+        public IActionResult Get()
+        {
+            var db = new AMCDbContext();
+            var todoLists = db.Activities.Select(s => s);
+            return Ok(todoLists);
+        }
+
+        [HttpGet]
+        [Route("{id}")]
+        public IActionResult Get(uint id)
+        {
+            var db = new AMCDbContext();
+            var todoLists = db.Activities.Where(s => s.Id == id).Select(s => s);
+
+            if (!todoLists.Any()) return NotFound();
+            
+            return Ok(todoLists);
+        }
     }
 }
