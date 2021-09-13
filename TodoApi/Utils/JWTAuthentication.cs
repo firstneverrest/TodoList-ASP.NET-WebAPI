@@ -1,6 +1,5 @@
 using System;
 using System.Text;
-using System.Collections.Generic;
 using System.Linq;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
@@ -31,21 +30,23 @@ namespace TodoApi.Utils
         public static string ValidateJwtToken(string token)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes("1234567812345678");
+
             try
             {
                 tokenHandler.ValidateToken(token, new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes("1234567812345678")),
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidIssuer = "chitsanupong",
+                    ValidAudience = "public",
                     // set clockskew to zero so tokens expire exactly at token expiration time (instead of 5 minutes later)
                     ClockSkew = TimeSpan.Zero
                 }, out SecurityToken validatedToken);
 
                 var jwtToken = (JwtSecurityToken)validatedToken;
-                var userid = jwtToken.Claims.First(x => x.Type == "Name").Value;
+                var userid = jwtToken.Claims.First(x => x.Type == "unique_name").Value;
 
                 // return account id from JWT token if validation successful
                 return userid;

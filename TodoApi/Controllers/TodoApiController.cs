@@ -26,13 +26,14 @@ namespace TodoApi.Controllers
         [Route("activities")]
         public IActionResult Get([FromHeader] string Authorization)
         {
-            // find token
+            // validate token
             try {
                 string[] authorization = Authorization.Split(' ');
                 string token = authorization[1];
-                if (token == null) return StatusCode(401, new {message = "Invalid Token"});
-            } catch {
-                return StatusCode(401, new {message = "Invalid Token"});
+                string userid = JWTAuthentication.ValidateJwtToken(token);
+                if (userid == null) return StatusCode(401, new {message = "Invalid Token"});
+           } catch (Exception e) {
+                return StatusCode(500, new {message = e.ToString()});
             }
 
             var db = new AMCDbContext();
@@ -44,13 +45,14 @@ namespace TodoApi.Controllers
         [Route("activities/{id}")]
         public IActionResult Get(uint id, [FromHeader] string Authorization)
         {
-            // find token
+            // validate token
             try {
                 string[] authorization = Authorization.Split(' ');
                 string token = authorization[1];
-                if (token == null) return StatusCode(401, new {message = "Invalid Token"});
-            } catch {
-                return StatusCode(401, new {message = "Invalid Token"});
+                string userid = JWTAuthentication.ValidateJwtToken(token);
+                if (userid == null) return StatusCode(401, new {message = "Invalid Token"});
+            } catch (Exception e) {
+                return StatusCode(500, new {message = e.ToString()});
             }
 
             var db = new AMCDbContext();
@@ -65,13 +67,14 @@ namespace TodoApi.Controllers
         [Route("activities")]
         public IActionResult Post([FromBody] Activity todo, [FromHeader] string Authorization)
         {
-            // find token
+            // validate token
             try {
                 string[] authorization = Authorization.Split(' ');
                 string token = authorization[1];
-                if (token == null) return StatusCode(401, new {message = "Invalid Token"});
-            } catch {
-                return StatusCode(401, new {message = "Invalid Token"});
+                string userid = JWTAuthentication.ValidateJwtToken(token);
+                if (userid == null) return StatusCode(401, new {message = "Invalid Token"});
+           } catch (Exception e) {
+                return StatusCode(500, new {message = e.ToString()});
             }
 
             try {
@@ -89,13 +92,14 @@ namespace TodoApi.Controllers
         [Route("activities/{id}")]
         public IActionResult Put([FromBody] Activity todo, [FromHeader] string Authorization, uint id)
         {
-            // find token
+            // validate token
             try {
                 string[] authorization = Authorization.Split(' ');
                 string token = authorization[1];
-                if (token == null) return StatusCode(401, new {message = "Invalid Token"});
-            } catch {
-                return StatusCode(401, new {message = "Invalid Token"});
+                string userid = JWTAuthentication.ValidateJwtToken(token);
+                if (userid == null) return StatusCode(401, new {message = "Invalid Token"});
+           } catch (Exception e) {
+                return StatusCode(500, new {message = e.ToString()});
             }
 
             try {
@@ -118,13 +122,14 @@ namespace TodoApi.Controllers
         [Route("activities/{id}")]
         public IActionResult Delete([FromHeader] string Authorization, uint id)
         {
-            // find token
+            // validate token
             try {
                 string[] authorization = Authorization.Split(' ');
                 string token = authorization[1];
-                if (token == null) return StatusCode(401, new {message = "Invalid Token"});
-            } catch {
-                return StatusCode(401, new {message = "Invalid Token"});
+                string userid = JWTAuthentication.ValidateJwtToken(token);
+                if (userid == null) return StatusCode(401, new {message = "Invalid Token"});
+           } catch (Exception e) {
+                return StatusCode(500, new {message = e.ToString()});
             }
 
             try {
@@ -147,7 +152,6 @@ namespace TodoApi.Controllers
 
             try {
                 var db = new AMCDbContext();
-                // var todoList = db.Users.Find(userid);
                 var user = db.Users.Where(s => s.Id == account.userid).Select(s => s);
                 if (!user.Any()) return NotFound();
                 var u = user.First();
