@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -141,24 +142,27 @@ namespace TodoApi.Controllers
 
         [HttpGet]
         [Route("tokens")]
-        public IActionResult GetToken([FromBody] string userid, string password)
+        public IActionResult GetToken([FromBody] Account account)
         {
-            if (userid == null || password == null) return BadRequest();
+            if (account.userid == null || account.password == null) return BadRequest();
 
             try {
                 var db = new AMCDbContext();
                 // var todoList = db.Users.Find(userid);
-                var user = db.Users.Where(s => s.Id == userid).Select(s => s);
+                var user = db.Users.Where(s => s.Id == account.userid).Select(s => s);
                 if (!user.Any()) return NotFound();
                 var u = user.First();
                 
                 // check password with hash function
-                bool isVerified = HashFunction.CheckPassword(password, u.Salt, u.Password);
+                // Console.WriteLine(account.password + " " + u.Salt + " " + u.Password);
+                bool isVerified = HashFunction.CheckPassword(account.password, Convert.FromBase64String(u.Salt), u.Password);
                 if (!isVerified) return Unauthorized();
 
+                return Ok();
+
                 // send token if the username and password is true
-                var token = jWTAuthentication.GenerateJwtToken(userid);
-                return Ok(new { token = token });
+                // var token = jWTAuthentication.GenerateJwtToken(account.userid);
+                // return Ok(new { token = token });
 
             } catch (Exception e) {
                 return StatusCode(500, new {message = e.ToString()});
@@ -170,16 +174,16 @@ namespace TodoApi.Controllers
         [Route("signup")]
         public IActionResult SignUp([FromBody] Account account)
         {
-            string[] hashedAndSalt = HashFunction.CreateHashAndSalt(account.password);
-            string salt = hashedAndSalt[0];
-            string hash = hashedAndSalt[1]; 
+            (Byte[] salt, string hash) hashedAndSalt = HashFunction.CreateHashAndSalt(account.password);
+            Byte[] salt = hashedAndSalt.salt;
+            string hash = hashedAndSalt.hash;  
 
             try {
                 var db = new AMCDbContext();
                 db.Users.Add(new User(){
                     Id = account.userid,
                     Password = hash,
-                    Salt = salt
+                    Salt = Convert.ToBase64String(salt),
                 });
                 db.SaveChanges();
             } catch (Exception e) {
