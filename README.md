@@ -1,5 +1,7 @@
 # Todo List Web API
 
+Web API with ASP.NET Core created for todo list application. This Web API include GET, POST, PUT, DELETE, connects with MariaDB, store password with hash & salt, and authentication with JWT.
+
 ## Set up Database
 
 Select MariaDB as a SQL database server. MariaDB is an open-source relational database management system(RDBMS) like MySQL.
