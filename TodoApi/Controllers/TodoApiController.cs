@@ -151,7 +151,7 @@ namespace TodoApi.Controllers
             try {
                 var db = new AMCDbContext();
                 var user = db.Users.Where(s => s.Id == account.userid).Select(s => s);
-                if (!user.Any()) return NotFound();
+                if (!user.Any()) return Unauthorized();
                 var u = user.First();
                 
                 // check password with hash function
