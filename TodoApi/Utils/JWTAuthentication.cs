@@ -8,9 +8,9 @@ using System.Security.Claims;
 
 namespace TodoApi.Utils
 {
-    public class JWTAuthentication : IJWTAuthentication
+    public static class JWTAuthentication
     {
-        public string GenerateJwtToken(string userid)
+        public static string GenerateJwtToken(string userid)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             // var tokenKey = Encoding.ASCII.GetBytes(key);
@@ -28,7 +28,7 @@ namespace TodoApi.Utils
             return tokenHandler.WriteToken(token);
         }
 
-        public string ValidateJwtToken(string token)
+        public static string ValidateJwtToken(string token)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes("1234567812345678");

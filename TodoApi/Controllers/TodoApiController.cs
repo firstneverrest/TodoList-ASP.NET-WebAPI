@@ -16,7 +16,6 @@ namespace TodoApi.Controllers
     public class TodoApiController : ControllerBase
     {
         private readonly ILogger<TodoApiController> _logger;
-        private readonly IJWTAuthentication jWTAuthentication;
 
         public TodoApiController(ILogger<TodoApiController> logger)
         {
@@ -154,15 +153,13 @@ namespace TodoApi.Controllers
                 var u = user.First();
                 
                 // check password with hash function
-                // Console.WriteLine(account.password + " " + u.Salt + " " + u.Password);
-                bool isVerified = HashFunction.CheckPassword(account.password, Convert.FromBase64String(u.Salt), u.Password);
+                bool isVerified = HashFunction.CheckPassword(account.password, u.Salt, u.Password);
                 if (!isVerified) return Unauthorized();
 
-                return Ok();
 
                 // send token if the username and password is true
-                // var token = jWTAuthentication.GenerateJwtToken(account.userid);
-                // return Ok(new { token = token });
+                var token = JWTAuthentication.GenerateJwtToken(account.userid);
+                return Ok(new { token = token });
 
             } catch (Exception e) {
                 return StatusCode(500, new {message = e.ToString()});
@@ -174,8 +171,8 @@ namespace TodoApi.Controllers
         [Route("signup")]
         public IActionResult SignUp([FromBody] Account account)
         {
-            (Byte[] salt, string hash) hashedAndSalt = HashFunction.CreateHashAndSalt(account.password);
-            Byte[] salt = hashedAndSalt.salt;
+            (string salt, string hash) hashedAndSalt = HashFunction.CreateHashAndSalt(account.password);
+            string salt = hashedAndSalt.salt;
             string hash = hashedAndSalt.hash;  
 
             try {
@@ -183,7 +180,7 @@ namespace TodoApi.Controllers
                 db.Users.Add(new User(){
                     Id = account.userid,
                     Password = hash,
-                    Salt = Convert.ToBase64String(salt),
+                    Salt = salt,
                 });
                 db.SaveChanges();
             } catch (Exception e) {
