@@ -1,5 +1,4 @@
 using System;
-using System.Text;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using TodoApi.Models;
 using TodoApi.Utils;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace TodoApi.Controllers
 {
