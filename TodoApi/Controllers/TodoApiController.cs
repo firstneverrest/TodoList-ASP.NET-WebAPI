@@ -142,10 +142,11 @@ namespace TodoApi.Controllers
             return Ok();
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("tokens")]
-        public IActionResult GetToken([FromBody] Account account)
+        public IActionResult Login([FromBody] Account account)
         {
+            Console.WriteLine(account);
             if (account.userid == null || account.password == null) return BadRequest();
 
             try {
@@ -161,7 +162,7 @@ namespace TodoApi.Controllers
 
                 // send token if the username and password is true
                 var token = JWTAuthentication.GenerateJwtToken(account.userid);
-                return Ok(new { token = token });
+                return StatusCode(201, new { token = token });
 
             } catch (Exception e) {
                 return StatusCode(500, new {message = e.ToString()});
