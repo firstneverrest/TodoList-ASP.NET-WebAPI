@@ -319,12 +319,12 @@ public IActionResult Delete([FromHeader] string Authorization, uint id)
 }
 ```
 
-## Get Token
+## Login and Get Token
 
 ```c#
-[HttpGet]
+[HttpPost]
 [Route("tokens")]
-public IActionResult GetToken([FromBody] Account account)
+public IActionResult Login([FromBody] Account account)
 {
     if (account.userid == null || account.password == null) return BadRequest();
 
@@ -376,6 +376,66 @@ public IActionResult SignUp([FromBody] Account account)
     return StatusCode(201);
 }
 ```
+
+## Cors Setting
+
+```
+dotnet add package Microsoft.AspNet.WebApi.Cors
+```
+
+```c#
+// add variable
+readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
+public void ConfigureServices(IServiceCollection services)
+{
+
+    // add services.AddCors
+    services.AddCors(options =>
+    {
+        options.AddPolicy(name: MyAllowSpecificOrigins,
+            builder =>
+            {
+                builder.WithOrigins("*").AllowAnyHeader().AllowAnyMethod();
+            });
+    });
+
+    services.AddControllers();
+    services.AddSwaggerGen(c =>
+    {
+        c.SwaggerDoc("v1", new OpenApiInfo { Title = "TodoApi", Version = "v1" });
+    });
+}
+
+public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+{
+    if (env.IsDevelopment())
+    {
+        app.UseDeveloperExceptionPage();
+        app.UseSwagger();
+        app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "TodoApi v1"));
+    }
+
+    app.UseHttpsRedirection();
+
+    app.UseRouting();
+
+    // Add app.UseCors
+    app.UseCors(MyAllowSpecificOrigins);
+
+    app.UseAuthorization();
+
+    app.UseEndpoints(endpoints =>
+    {
+        endpoints.MapControllers();
+    });
+}
+```
+
+### Reference
+
+- [Enabling CORS in ASP.NET Web API](https://medium.com/easyread/enabling-cors-in-asp-net-web-api-4be930f97a5c)
+- [Enable Cross-Origin Requests (CORS) in ASP.NET Core](https://docs.microsoft.com/en-us/aspnet/core/security/cors?view=aspnetcore-5.0#cors-policy-options-1)
 
 ## Problem Solving
 
