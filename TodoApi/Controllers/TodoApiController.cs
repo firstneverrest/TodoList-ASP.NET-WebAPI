@@ -146,7 +146,6 @@ namespace TodoApi.Controllers
         [Route("tokens")]
         public IActionResult Login([FromBody] Account account)
         {
-            Console.WriteLine(account);
             if (account.userid == null || account.password == null) return BadRequest();
 
             try {
