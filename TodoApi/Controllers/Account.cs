@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace TodoApi.Utils
+namespace TodoApi.Controllers
 {
     public class Account
     {
