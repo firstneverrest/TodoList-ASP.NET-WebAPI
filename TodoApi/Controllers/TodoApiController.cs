@@ -35,8 +35,10 @@ namespace TodoApi.Controllers
             }
 
             var db = new AMCDbContext();
-            var todoLists = db.Activities.Select(s => s);
-            return Ok(todoLists);
+            var activities = db.Activities.Select(s => s).OrderBy(a => a.When);
+
+            if (!activities.Any()) return NoContent();
+            return Ok(activities);
         }
 
         [HttpGet]
@@ -54,11 +56,11 @@ namespace TodoApi.Controllers
             }
 
             var db = new AMCDbContext();
-            var todoLists = db.Activities.Where(s => s.Id == id).Select(s => s);
+            var activity = db.Activities.Where(s => s.Id == id).Select(s => s);
 
-            if (!todoLists.Any()) return NotFound();
+            if (!activity.Any()) return NotFound();
             
-            return Ok(todoLists);
+            return Ok(activity);
         }
 
         [HttpPost]
@@ -102,9 +104,9 @@ namespace TodoApi.Controllers
 
             try {
                 var db = new AMCDbContext();
-                var todoList = db.Activities.Where(s => s.Id == id).Select(s => s);
-                if (!todoList.Any()) return NotFound();
-                var td = todoList.First();
+                var activity = db.Activities.Where(s => s.Id == id).Select(s => s);
+                if (!activity.Any()) return NotFound();
+                var td = activity.First();
                 td.Id = id;
                 td.Name = todo.Name;
                 td.When = todo.When;
@@ -132,8 +134,8 @@ namespace TodoApi.Controllers
 
             try {
                 var db = new AMCDbContext();
-                var todoList = db.Activities.Find(id);
-                db.Activities.Remove(todoList);
+                var activity = db.Activities.Find(id);
+                db.Activities.Remove(activity);
                 db.SaveChanges();
             } catch (Exception e) {
                 return StatusCode(500, new {message = e.ToString()});
