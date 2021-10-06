@@ -11,18 +11,23 @@ namespace TodoApi.Utils
     {
         public static string GenerateJwtToken(string userid)
         {
-            var tokenHandler = new JwtSecurityTokenHandler();
             // var tokenKey = Encoding.ASCII.GetBytes(key);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(new Claim[] { new Claim(ClaimTypes.Name, userid)}),
+                Subject = new ClaimsIdentity(new Claim[] { 
+                    new Claim(ClaimTypes.Name, userid), 
+                    new Claim(ClaimTypes.Role, "user")
+                }),
                 NotBefore = DateTime.UtcNow,
                 Expires = DateTime.UtcNow.AddHours(3),
                 IssuedAt = DateTime.UtcNow,
                 Issuer = "chitsanupong",
                 Audience = "public",
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes("1234567812345678")), SecurityAlgorithms.HmacSha256Signature),
+                SigningCredentials = new SigningCredentials(
+                    new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Program.SecurityKey)), 
+                    SecurityAlgorithms.HmacSha256Signature),
             };
+            var tokenHandler = new JwtSecurityTokenHandler();
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }

@@ -11,6 +11,7 @@ namespace TodoApi
 {
     public class Program
     {
+        public static string SecurityKey = "1234567812345678";
         public static void Main(string[] args)
         {
             CreateHostBuilder(args).Build().Run();
@@ -20,7 +21,8 @@ namespace TodoApi
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseStartup<Startup>();
+                    // webBuilder.UseStartup<Startup>().UseUrls("http://192.168.1.61:5000");
+                    webBuilder.UseStartup<Startup>().UseUrls("http://localhost:5000");
                 });
     }
 }
