@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using TodoApi.Models;
 using TodoApi.Utils;
+using TodoApi.DTOs;
 
 namespace TodoApi.Controllers
 {
@@ -32,7 +33,7 @@ namespace TodoApi.Controllers
                 if (userid == null) return StatusCode(401, new {message = "Invalid Token"});
            } catch (Exception e) {
                 return StatusCode(500, new {message = e.ToString()});
-            }
+           }
 
             var db = new AMCDbContext();
             var activities = db.Activities.Select(s => s).OrderBy(a => a.When);
@@ -65,7 +66,7 @@ namespace TodoApi.Controllers
 
         [HttpPost]
         [Route("activities")]
-        public IActionResult Post([FromBody] Activity todo, [FromHeader] string Authorization)
+        public IActionResult Post([FromBody] ActivityDTO Dto, [FromHeader] string Authorization)
         {
             // validate token
             try {
@@ -79,7 +80,10 @@ namespace TodoApi.Controllers
 
             try {
                 var db = new AMCDbContext();
-                db.Activities.Add(todo);
+                Activity activity = new Activity();
+                activity.Name = Dto.Name;
+                activity.When = Dto.When;
+                db.Activities.Add(activity);
                 db.SaveChanges();
             } catch (Exception e) {
                 return StatusCode(500, new {message = e.ToString()});
@@ -90,7 +94,7 @@ namespace TodoApi.Controllers
 
         [HttpPut]
         [Route("activities/{id}")]
-        public IActionResult Put([FromBody] Activity todo, [FromHeader] string Authorization, uint id)
+        public IActionResult Put([FromBody] ActivityDTO Dto, [FromHeader] string Authorization, uint id)
         {
             // validate token
             try {
@@ -108,8 +112,8 @@ namespace TodoApi.Controllers
                 if (!activity.Any()) return NotFound();
                 var td = activity.First();
                 td.Id = id;
-                td.Name = todo.Name;
-                td.When = todo.When;
+                td.Name = Dto.Name;
+                td.When = Dto.When;
                 db.SaveChanges();
             } catch (Exception e) {
                 return StatusCode(500, new {message = e.ToString()});
@@ -146,23 +150,23 @@ namespace TodoApi.Controllers
 
         [HttpPost]
         [Route("tokens")]
-        public IActionResult Login([FromBody] Account account)
+        public IActionResult Login([FromBody] AccountDTO Dto)
         {
-            if (account.userid == null || account.password == null) return BadRequest();
+            if (Dto.userid == null || Dto.password == null) return BadRequest();
 
             try {
                 var db = new AMCDbContext();
-                var user = db.Users.Where(s => s.Id == account.userid).Select(s => s);
+                var user = db.Users.Where(s => s.Id == Dto.userid).Select(s => s);
                 if (!user.Any()) return Unauthorized();
                 var u = user.First();
                 
                 // check password with hash function
-                bool isVerified = HashFunction.CheckPassword(account.password, u.Salt, u.Password);
+                bool isVerified = HashFunction.CheckPassword(Dto.password, u.Salt, u.Password);
                 if (!isVerified) return Unauthorized();
 
 
                 // send token if the username and password is true
-                var token = JWTAuthentication.GenerateJwtToken(account.userid);
+                var token = JWTAuthentication.GenerateJwtToken(Dto.userid);
                 return StatusCode(201, new { token = token });
 
             } catch (Exception e) {
@@ -173,16 +177,16 @@ namespace TodoApi.Controllers
 
         [HttpPost]
         [Route("signup")]
-        public IActionResult SignUp([FromBody] Account account)
+        public IActionResult SignUp([FromBody] AccountDTO Dto)
         {
-            (string salt, string hash) hashedAndSalt = HashFunction.CreateHashAndSalt(account.password);
+            (string salt, string hash) hashedAndSalt = HashFunction.CreateHashAndSalt(Dto.password);
             string salt = hashedAndSalt.salt;
             string hash = hashedAndSalt.hash;  
 
             try {
                 var db = new AMCDbContext();
                 db.Users.Add(new User(){
-                    Id = account.userid,
+                    Id = Dto.userid,
                     Password = hash,
                     Salt = salt,
                 });
