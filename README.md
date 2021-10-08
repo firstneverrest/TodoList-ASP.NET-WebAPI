@@ -2,6 +2,13 @@
 
 Web API with ASP.NET Core created for todo list application. This Web API include GET, POST, PUT, DELETE, connects with MariaDB, store password with hash & salt, and authentication with JWT.
 
+## Technologies
+
+![image](https://img.shields.io/badge/Xampp-F37623?style=for-the-badge&logo=xampp&logoColor=white)
+![image](https://img.shields.io/badge/MariaDB-003545?style=for-the-badge&logo=mariadb&logoColor=white)
+![image](https://img.shields.io/badge/.NET-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)
+![image](https://img.shields.io/badge/C%23-239120?style=for-the-badge&logo=c-sharp&logoColor=white)
+
 ## Set up Database
 
 Select MariaDB as a SQL database server. MariaDB is an open-source relational database management system(RDBMS) like MySQL.
@@ -390,16 +397,6 @@ readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 public void ConfigureServices(IServiceCollection services)
 {
 
-    // add services.AddCors
-    services.AddCors(options =>
-    {
-        options.AddPolicy(name: MyAllowSpecificOrigins,
-            builder =>
-            {
-                builder.WithOrigins("*").AllowAnyHeader().AllowAnyMethod();
-            });
-    });
-
     services.AddControllers();
     services.AddSwaggerGen(c =>
     {
@@ -421,7 +418,7 @@ public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     app.UseRouting();
 
     // Add app.UseCors
-    app.UseCors(MyAllowSpecificOrigins);
+    app.UseCors(options => options.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
 
     app.UseAuthorization();
 
@@ -429,6 +426,53 @@ public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
         endpoints.MapControllers();
     });
+}
+```
+
+### Authorize header in every API
+
+```c#
+// Startup.cs
+public void ConfigureServices(IServiceCollection services)
+{
+
+    services.AddControllers();
+
+    // authenticate JWT in every API
+    services.AddAuthentication(options => {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+    }).AddJwtBearer(options => {
+        options.SaveToken = true;
+        options.RequireHttpsMetadata = false;
+        options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters() {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidIssuer = "chitsanupong",
+            ValidAudience = "public",
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Program.SecurityKey))
+        };
+    });
+
+    services.AddSwaggerGen(c =>
+    {
+        c.SwaggerDoc("v1", new OpenApiInfo { Title = "TodoApi", Version = "v1" });
+    });
+}
+```
+
+```c#
+// TodoApiController
+[Route("activities")]
+[HttpGet]
+[Authorize(Roles = "user")] // add authorize
+public IActionResult Get()
+{
+    var db = new AMCDbContext();
+    var activities = db.Activities.Select(s => s).OrderBy(a => a.When);
+    if (!activities.Any()) return NoContent();
+    return Ok(activities);
 }
 ```
 
